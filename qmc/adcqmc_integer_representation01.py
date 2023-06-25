@@ -1,5 +1,5 @@
 import numpy as np
-# a,b,c,d = 1,5,6,13
+# a,b,c,d = 1,5,6,13  #
 # occ=np.array(range(a,b+1))
 # vir =np.array( range(c,d+1))
 
