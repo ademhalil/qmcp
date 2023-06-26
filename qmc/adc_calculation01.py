@@ -164,7 +164,7 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
                 nmax=100
                 index, maxValues = myadcc.find_top_vector_elements(Y, nmax)
                 info_section = "molecule: "+mol_name + " mol_basis: " + mol_basis + " spin: " + str(spin) + " method: "+ method['method']
-                myadcc.generate_trial_wf_with_basis_with_group(mygroup, orbsym, index, maxValues, spin, A,B,"trialwf_"+flnmroot+method, info_section)
+                myadcc.generate_trial_wf_with_basis_with_group(mygroup, orbsym, index, maxValues, spin, A,B,"trialwf_"+flnmroot+method['method'], info_section)
                 for istate in range(nstate):
                     print("istate: ",istate)
                     for counter, imax in enumerate(index[istate]):
