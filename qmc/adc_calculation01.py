@@ -172,7 +172,7 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
                     print("***")
                     
             
-                assert myadcc.write_Y_vector_to_binary_file(Y, flnmroot+method)
+                assert myadcc.write_Y_vector_to_binary_file(Y, flnmroot+method['method'])
                 #M = myadcc.read_Y_vector_from_binary_file(flnmroot+method)
 
 # # def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol_geo, integral_dir, adc_methods, flag_write_integral, \
