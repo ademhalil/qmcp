@@ -146,7 +146,7 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
                 #     else :
                 #         assert 0
     
-                adcstate = myadcc.adcc.adc2x(HFrun, **method) 
+                adcstate = myadcc.adcc.run_adc(HFrun, **method) 
     
                 print(adcstate.describe())
                 print("*******")
