@@ -1,5 +1,5 @@
 import numpy as np
-# a,b,c,d = 1,5,6,13  #
+# a,b,c,d = 1,5,6,13
 # occ=np.array(range(a,b+1))
 # vir =np.array( range(c,d+1))
 
@@ -143,10 +143,17 @@ def get_numbers(spin,a,b,c,d):
 
     return n1,n2,n3,n4,n5,n6
         
-def get_sizetot(spin,a,b,c,d):
+def get_sizetot(spin,a,b,c,d, adcmethod):
     #a,b,c,d = window[0],window[1], window[2],window[3]    
     n1,n2,n3,n4,n5,n6 = get_numbers(spin,a,b,c,d)
-    sizetot = n1 + n2 + n3 + n4 + n5 + n6
+    
+    if adcmethod_order == 'adc1':
+        sizetot = n1
+    elif adcmethod_order =='adc2'  or adcmethod_order =='adc2x' or adcmethod_order =='adc3':
+        sizetot = n1 + n2 + n3 + n4 + n5 + n6
+    else:
+        print(adcmethod," not defined yete.")
+        assert 0
     return sizetot, n1, n2, n3, n4, n5, n6
 
 def find_jk_from_n1(N,a,b,c,d):

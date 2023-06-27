@@ -129,6 +129,7 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
         
         
             for count, method in enumerate(adc_methods):
+                sizetot, n1,n2,n3,n4,n5,n6 = adcrep.get_sizetot(spin, a,b,c,d)
                 print("\n\n**************** ADC METHOD *********** :",method['method'])
                 # if spin==3:
                 #     if method=="adc2s":
