@@ -78,12 +78,12 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
             HFrun, energies, A,B = myadcc.do_HFrun(mol, flag_chkfile, chkfile)
             #mol_eq = optimize(HFrun, maxsteps=100)
             a,b,c,d = 1,A,A+1,B
-            sizetot, n1,n2,n3,n4,n5,n6 = adcrep.get_sizetot(spin, a,b,c,d)
+            sizetot, n1,n2,n3,n4,n5,n6 = adcrep.get_sizetot(spin, a,b,c,d,'adc2')
             print(mol_name)
             print(mol.output)
             print(output_flnm)
             print(integral_files_flnm_root)
-            print("sizetot=",sizetot)
+            print("sizetot=",sizetot," numbers: n1:",n1," n2:",n2," n3:",n3," n4:",n4," n5:",n5," n6:",n6)
             print("A=",A,"B=",B, "Nvirtual=", B-A)
             print("spin=",spin,"basis=", mol.basis,"symmetry:",mol.symmetry)
             
@@ -129,7 +129,6 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
         
         
             for count, method in enumerate(adc_methods):
-                sizetot, n1,n2,n3,n4,n5,n6 = adcrep.get_sizetot(spin, a,b,c,d)
                 print("\n\n**************** ADC METHOD *********** :",method['method'])
                 # if spin==3:
                 #     if method=="adc2s":
@@ -147,6 +146,7 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
                 #     else :
                 #         assert 0
     
+                sizetot, n1,n2,n3,n4,n5,n6 = adcrep.get_sizetot(spin, a,b,c,d,method['method'])
                 adcstate = myadcc.adcc.run_adc(HFrun, **method) 
     
                 print(adcstate.describe())

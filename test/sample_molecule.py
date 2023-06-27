@@ -19,10 +19,10 @@ mol_geo = '''8  0  0.     0
 integral_dir =""
 # method1 = {'method':'adc2','n_singlets':nstate, 'n_guesses':None, 'max_subspace':None, 'max_iter':None}
 # method2 =  {'method':'adc2x','n_singlets':nstate, 'n_guesses':None, 'max_subspace':None, 'max_iter':None}
-method1 = {'method':'adc2','n_singlets':nstate, 'n_guesses':None, 'max_subspace':None, 'max_iter':100}
-method2 =  {'method':'adc2x','n_singlets':nstate, 'n_guesses':None, 'max_subspace':None, 'max_iter':100}
+method1 = {'method':'adc1','n_singlets':nstate, 'n_guesses':None, 'max_subspace':None, 'max_iter':100}
+#method2 =  {'method':'adc2x','n_singlets':nstate, 'n_guesses':None, 'max_subspace':None, 'max_iter':100}
 
-adc_methods = [method1, method2] #["adc2s","adc2x"]
+adc_methods = [method1] #["adc2s","adc2x"]
 flag_write_integral = False 
 flag_chkfile = True
 chkfile = "chkfile_"+mol_name
