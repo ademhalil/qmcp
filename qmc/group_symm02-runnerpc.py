@@ -98,6 +98,9 @@ class group:
         final_id = self.reverse_dict[final_name]
         return final_id
 
+    def does_ABCD_to_lead_to_E(self, A,B,C,D,E):
+        return E==self.get_direct_product_with_id4(A, B, C, D)
+
     def get_direct_product_with_name(self,p,q):
         pID, qID = self.reverse_dict[p], self.reverse_dict[q]
         product_name = self.direct_product_table[pID,qID]

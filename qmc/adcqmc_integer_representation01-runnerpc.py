@@ -163,6 +163,22 @@ def get_blocks_with_gp(mygroup, target_irrep_id):
                                 
     return s1,s2,s4
                     
+
+def generate_Nmu(mygroup, orbsymm_NUMPY):
+    
+    orbsymm = [a for a in orbsymm_NUMPY]
+    Nmu = [0 for a in range(mygroup.size)]
+    mu_orbs= [[] for a in range(mygroup.size)]
+    
+    for i,s in enumerate(orbsymm):
+        Nmu[s] +=1
+        mu_orbs[s].append(i)
+        
+    print("orbsymm:",orbsymm)
+    print("Nmu:", Nmu)
+    print("mu_orbs:", mu_orbs)
+    
+    return orbsymm, Nmu, mu_orbs
             
 def get_numbers_with_gp(mygroup, orbsymm_NUMPY, spin, A,B):
     

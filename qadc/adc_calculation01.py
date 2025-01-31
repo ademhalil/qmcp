@@ -94,7 +94,13 @@ def calculate(nstate,spin, flag_mol_symmetry, mol_basis, mol_unit, mol_name, mol
         if IwriteOpt==2:
             twobody_integral_file_name, energy_file_name = myadcc.write_integrals2(eri_4fold, HFrun.mo_coeff,energies, integral_files_flnm_root)
         elif IwriteOpt==3:
-            twobody_integral_file_name, energy_file_name = myadcc.write_integrals3(eri_4fold, HFrun.mo_coeff,energies, integral_files_flnm_root)      
+            twobody_integral_file_name, energy_file_name = myadcc.write_integrals3(eri_4fold, HFrun.mo_coeff,energies, integral_files_flnm_root)     
+        elif IwriteOpt==4:
+            orbsym = symm.label_orb_symm(mol,mol.irrep_id, mol.symm_orb, HFrun.mo_coeff)
+            #mygroup = group.group(mol.topgroup)
+            mygroup = group.group(mol.groupname)
+            orbsymm, Nmu, mu_orbs = adcrep.generate_Nmu(mygroup, orbsym)
+            integral_flnm_human, integral_flnm_bin = myadcc.write_integrals4(eri_4fold, HFrun.mo_coeff, energies, integral_files_flnm_root, mygroup, Nmu, mu_orbs, orbsym)
         else:
             print("write option ",IwriteOpt, " is not recognised.")
             sys.stdout.flush()

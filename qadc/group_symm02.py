@@ -6,7 +6,7 @@ Created on Sun Mar 27 01:17:03 2022
 """
 import numpy as np
 #import .adcqmc_integer_representation01 as adcrep
-from . import adcqmc_integer_representation01 as adcrep
+# from . import adcqmc_integer_representation01 as adcrep
 
 def func2(line):
     if line[-1]=='\n':
@@ -24,7 +24,15 @@ def func2(line):
 
 class group:
     def __init__(self,groups):
-        if groups=='c2' or groups=='C2':
+        if groups=='c1' or groups=='C1':
+            self.groupName = "C1"
+            self.size = 1
+            self.irrep_set = ['A']
+            self.irrep_id_set = [0]
+            self.dict={0:'A'}
+            self.reverse_dict = {'A':0}
+            self.direct_product_table = np.array([['A']])
+        elif groups=='c2' or groups=='C2':
             self.groupName = "C2"
             self.size = 2
             self.irrep_set = ['A','B']
@@ -98,56 +106,17 @@ class group:
         final_id = self.reverse_dict[final_name]
         return final_id
 
+    def does_ABCD_to_lead_to_E(self, A,B,C,D,E):
+        return E==self.get_direct_product_with_id4(A, B, C, D)
+
     def get_direct_product_with_name(self,p,q):
         pID, qID = self.reverse_dict[p], self.reverse_dict[q]
         product_name = self.direct_product_table[pID,qID]
         return product_name
       
     
-    def find_irrep_id_orb(self, orbsym, order, spin, A,B):
-        a,b,c,d = 1,A,A+1,B
-        basis, orbs = adcrep.find_basis_orbs_from_order(order, spin,a,b,c,d)
-        if spin==1:
-            if basis==1:
-                orb1, orb2 = orbs[0], orbs[1]
-                irrep1, irrep2 = orbsym[orb1-1], orbsym[orb2-1]
-                return self.get_direct_product_with_id(irrep1, irrep2)
-            elif basis==2 or basis==3:
-                orb1, orb2, orb3, orb4 = orbs[0], orbs[1], orbs[2], orbs[3]
-                irrep1, irrep2, irrep3, irrep4 = orbsym[orb1-1], orbsym[orb2-1], orbsym[orb3-1],orbsym[orb4-1]
-                return self.get_direct_product_with_id4(irrep1, irrep2, irrep3, irrep4)
-            elif basis==4:
-                orb1, orb2, orb3 = orbs[0], orbs[1], orbs[2]
-                irrep1, irrep2, irrep3 = orbsym[orb1-1], orbsym[orb2-1], orbsym[orb3-1]
-                return self.get_direct_product_with_id(irrep2, irrep3)        
-            elif basis==5:
-                orb1, orb2, orb3 = orbs[0], orbs[1], orbs[2]
-                irrep1, irrep2, irrep3 = orbsym[orb1-1], orbsym[orb2-1], orbsym[orb3-1]
-                return self.get_direct_product_with_id(irrep1, irrep2)     
-            else :
-                return self.get_direct_product_with_id(0, 0) 
-        else:
-            if basis==1:
-                orb1, orb2 = orbs[0], orbs[1]
-                irrep1, irrep2 = orbsym[orb1-1], orbsym[orb2-1]
-                return self.get_direct_product_with_id(irrep1, irrep2)
-            elif basis==2 or basis==3 or basis==4:
-                orb1, orb2, orb3, orb4 = orbs[0], orbs[1], orbs[2], orbs[3]
-                irrep1, irrep2, irrep3, irrep4 = orbsym[orb1-1], orbsym[orb2-1], orbsym[orb3-1],orbsym[orb4-1]
-                return self.get_direct_product_with_id4(irrep1, irrep2, irrep3, irrep4)
-            elif basis==5:
-                orb1, orb2, orb3 = orbs[0], orbs[1], orbs[2]
-                irrep1, irrep2, irrep3 = orbsym[orb1-1], orbsym[orb2-1], orbsym[orb3-1]
-                return self.get_direct_product_with_id(irrep2, irrep3)        
-            elif basis==6:
-                orb1, orb2, orb3 = orbs[0], orbs[1], orbs[2]
-                irrep1, irrep2, irrep3 = orbsym[orb1-1], orbsym[orb2-1], orbsym[orb3-1]
-                return self.get_direct_product_with_id(irrep1, irrep2)     
-            else :
-                return self.get_direct_product_with_id(0, 0)            
-    def find_irrep_name_orb(self, orbsym, order, spin, A,B):
-         irrep_id = self.find_irrep_id_orb(orbsym, order, spin, A,B)
-         return self.dict[irrep_id]
+       
+
         
 # g = group('c2')    
 # print(g.get_direct_product_with_id(0,1))

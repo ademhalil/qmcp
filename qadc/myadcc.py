@@ -5,15 +5,136 @@
 
 #import .group_symm02 as group
 from . import group_symm02 as group
-from . import adcqmc_integer_representation01 as adcrep
+from . import  adcrep
 from pyscf import gto, scf
 import adcc
 import numpy as np
 import pyscf
 from numpy.linalg import eigh
 import struct 
+import math
 # import qmc.adcqmc_integer_representation01 as adcrep
 
+
+	##I is the order of \sum_b \sum_a=0^b, i.e   a<=b
+def get_ab(I):
+    amin = 0
+    bmax = 0.5 * (-1 + math.sqrt(1 - 8 * (amin - I)))
+    b = int(bmax)
+    a = I - b * (b + 1) // 2
+
+    assert a <= b
+    return a, b
+
+
+def write_integrals4(eri_4fold, orb, energies, integral_flnm, gp, Nmu, mu_orbs, mosym):
+    
+    integral_test_flnm = integral_flnm +"_test"
+    integral_bin_flnm = integral_flnm +"_bin"
+    integral_human_flnm = integral_flnm +"_human"
+    integral_file =  open(integral_human_flnm,'w')
+    integral_file_bin =  open(integral_bin_flnm,'wb')
+    integral_file_test = open(integral_test_flnm,'w')
+    
+    print("integral { group "+ gp.groupName +"  binaryfile "+ integral_bin_flnm +" norb "+str(orb.shape[1]), file=integral_file, end=" ")
+    print("irrep_mo_map_id { ", file=integral_file, end=" ")
+    for s in mosym:
+        print(s, file=integral_file, end=" ")
+    print(" } ", file=integral_file, end=" ")
+    print(" energies { ", file=integral_file, end=" ")
+    for s in energies:
+        print(s, file=integral_file, end=" ")
+    print(" } ", file=integral_file, end=" ")
+    print(" } ", file=integral_file, end=" \n")
+    
+    
+    s = gp.size
+    gamma1max = s*(s+1)//2
+    Ksize = gamma1max*(gamma1max +1)//2
+    
+    Ksize_total =0;
+    for Ixyzt in range(Ksize):
+        Ixy,Izt = get_ab(Ixyzt)
+        x,y = get_ab(Ixy)
+        z,t = get_ab(Izt)
+        
+        if gp.does_ABCD_to_lead_to_E(x, y, z, t, 0):
+            Jzt_max = (Nmu[t] * (Nmu[t] + 1) // 2) if z == t else (Nmu[t] * Nmu[z])
+            Jxy_max = (Nmu[y] * (Nmu[y] + 1) // 2) if x == y else (Nmu[x] * Nmu[y])
+            Jxyzt_max = (Jzt_max * (Jzt_max + 1)//2) if Ixy == Izt else (Jzt_max * Jxy_max)
+    
+            Ksize_total += Jxyzt_max
+
+    #K = np.ndarray((Ksize_total,), dtype='d')
+    
+    count =0
+    for Ixyzt in range(Ksize):
+        Ixy,Izt = get_ab(Ixyzt)
+        x,y = get_ab(Ixy)
+        z,t = get_ab(Izt)
+        
+        if gp.does_ABCD_to_lead_to_E(x, y, z, t, 0) and min(Nmu[x], Nmu[y], Nmu[z], Nmu[t])>0:  
+            Jzt_max = (Nmu[t] * (Nmu[t] + 1) // 2) if z == t else (Nmu[t] * Nmu[z])
+            Jxy_max = (Nmu[y] * (Nmu[y] + 1) // 2) if x == y else (Nmu[x] * Nmu[y])
+            Jxyzt_max = (Jzt_max * (Jzt_max + 1)//2) if Ixy == Izt else (Jzt_max * Jxy_max)
+            
+            for Jabcd_xyzt in range(Jxyzt_max):
+                if Ixy==Izt:
+                    Jab_xy,Jcd_zt = get_ab(Jabcd_xyzt)
+                else:
+                    Jab_xy = Jabcd_xyzt % Jxy_max
+                    Jcd_zt = Jabcd_xyzt // Jxy_max
+                
+                if x==y:
+                    a,b = get_ab(Jab_xy)
+                else:
+                    a =  Jab_xy % Nmu[x]
+                    b = Jab_xy // Nmu[x]
+                
+                if z==t:
+                    c,d = get_ab(Jcd_zt)
+                else:
+                    c =  Jcd_zt % Nmu[z]
+                    d = Jcd_zt // Nmu[z]         
+                    
+                
+                
+                print("Ixyzt/Ksize:",Ixyzt,"/",Ksize,"Jabcd_xyzt/Jxyzt_max:",Jabcd_xyzt, "/",Jxyzt_max, "Jab_xy:",Jab_xy,"Jcd_zt:",Jcd_zt)
+                print("Jxy_max:",Jxy_max,"Jzt_max:",Jzt_max,"Jxyzt_max:",Jxyzt_max)
+                print("Ixy,Izt:", Ixy, Izt)
+                print("a,b,c,d:",a,b,c,d)
+                print("x,y,z,t:",x,y,z,t)
+                print("mu_orbs:", mu_orbs)
+                ax = mu_orbs[x][a]
+                by = mu_orbs[y][b]
+                cz = mu_orbs[z][c]
+                dt = mu_orbs[t][d]
+                
+                i,j = min(ax,by), max(ax,by)
+                k,L = min(cz,dt), max(cz, dt)
+                
+                ij = j*(j+1)//2 + i
+                kL = L*(L+1)//2 + k
+                
+                
+                q,w = min(ij,kL), max(ij,kL)
+                #K[count] = eri_4fold[q,w]
+                integral_file_bin.write(struct.pack('d',eri_4fold[q,w]))
+                
+                integral_file_test.write(f"xyzt {x} {y} {z} {z}: abcd {a} {b} {c} {d} :\
+                                         axbyczdt {ax} {by} {cz} {dt} : eri {eri_4fold[q,w]} \n")
+                count +=1
+                
+    assert count == Ksize_total
+    
+    integral_file.close()
+    integral_file_bin.close()
+    integral_file_test.close()
+    
+    return integral_human_flnm, integral_bin_flnm
+
+                
+    
 
 def write_integrals3(eri_4fold, orb,energies, flnmROOT): 
     
@@ -57,7 +178,7 @@ def write_integrals3(eri_4fold, orb,energies, flnmROOT):
                     
                     if flag:
                         twobody_integral_file.write(struct.pack('d',eri_4fold[a,b]))
-                        #print(i+1,j+1,k+1,L+1,eri_4fold[a,b], file=file_twobody_human)
+                        print(i,j,k,L,eri_4fold[a,b], file=file_twobody_human)
                         # assert eri_4fold[a,b] == depo[count]
                         #print(count, eri_4fold[a,b], depo[count])
                         count +=1
@@ -287,10 +408,22 @@ def test_integrals(mol,orb,HFrun):
     print("EHF from code=",HFrun.e_tot,"  EHF from test=",EHF)
 
 
-def get_eigenvectors_from_adcc(nstate,spin, sizetot, A,B, state2x):   
+def get_eigenvectors_from_adcc(nstate,spin, A,B, state2x):   
     
     assert len(state2x.excitation_vector)==nstate
+    frozen_core = len(state2x.matrix.mospaces.frozen_core)//2
+    frozen_vir = len(state2x.matrix.mospaces.frozen_virtual)//2
+    A = A - frozen_core
+    B = B - frozen_core - frozen_vir
     a,b,c,d = 1,A,A+1,B
+    n1,n2,n3,n4,n5,n6 = adcrep.get_numbers(spin,a,b,c,d)
+    if state2x.method.level==1:
+        sizetot = n1
+    else:
+        sizetot = n1 + n2 + n3 + n4 + n5 + n6
+    
+    assert state2x.method.level==1 or state2x.method.level==2
+    
     Y = np.ndarray((nstate,sizetot))
 
     for order in range(1,sizetot+1):
